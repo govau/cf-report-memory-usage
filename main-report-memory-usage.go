@@ -273,12 +273,19 @@ func (c *reportMemoryUsage) reportMemoryUsage(client *simpleClient, out io.Write
 			fmt.Sprintf("/%s", row.Key),
 			toHumanSize(row.MemoryUsage),
 			toHumanSize(row.MemoryQuota),
-			fmt.Sprintf("%d%%", (row.MemoryUsage*100.0)/row.MemoryQuota),
+			toPercent(row.MemoryUsage, row.MemoryQuota),
 		})
 	}
 	table.Render()
 
 	return nil
+}
+
+func toPercent(num, denom int) string {
+	if denom == 0 {
+		return "NaN"
+	}
+	return fmt.Sprintf("%d%%", (num*100.0)/denom)
 }
 
 func toHumanSize(b int) string {
@@ -311,7 +318,7 @@ func (c *reportMemoryUsage) GetMetadata() plugin.PluginMetadata {
 		Name: "report-memory-usage",
 		Version: plugin.VersionType{
 			Major: 0,
-			Minor: 1,
+			Minor: 2,
 			Build: 0,
 		},
 		MinCliVersion: plugin.VersionType{
